@@ -9,11 +9,14 @@
 3. 导入 GitHub 仓库（如果是第一次使用，需要先授权 Vercel 访问你的 GitHub 账号）
 4. 选择包含 vercel-github-proxy 代码的仓库
 5. 配置项目（可以保持默认设置）
-6. 在环境变量部分，可以添加以下可选环境变量：
-   - `GITHUB_TOKEN`：GitHub 个人访问令牌，用于访问私有仓库
+6. 在环境变量部分，可以按需添加（均为可选）：
+   - `GITHUB_TOKEN`：GitHub 个人访问令牌（需 `repo` 权限），用于访问私有仓库
+   - `WHITELIST`：只允许代理这些 GitHub 用户/组织的仓库，用逗号分隔，留空不限制
+   - `PREFIX`：路径自定义前缀
    - `URL`：设置后，主页将显示为伪装页面
    - `URL302`：设置后，访问主页将 302 跳转到指定 URL
    - `BLOCKED_USER_AGENTS`：要屏蔽的用户代理关键词，用逗号分隔
+   - `RATE_LIMIT`：每 IP 每分钟最大请求数，0 或留空不限制
 7. 点击 "Deploy" 按钮开始部署
 8. 等待部署完成后，Vercel 会提供一个 `*.vercel.app` 域名
 
@@ -41,17 +44,22 @@
 
 ### 无法访问私有仓库
 
-确保已正确设置 `GITHUB_TOKEN` 环境变量，并且该 Token 具有访问私有仓库的权限。
+确保已正确设置 `GITHUB_TOKEN` 环境变量，并且该 Token 具有访问私有仓库的 `repo` 权限。
 
-### 文件下载问题
+### 大文件下载中断
 
-如果遇到大文件下载问题：
-1. 检查 Vercel 的日志以查看具体错误
-2. 确认 vercel.json 中的内存和超时设置是否足够
-3. 对于特别大的文件（>50MB），可能会受到 Vercel 平台限制
+函数时长上限为 300 秒（Hobby 套餐，Fluid 计算默认值），超过后下载会被中断：
+1. 使用支持断点续传的下载工具（本项目已透传 Range 请求头，支持从断点恢复）
+2. Pro 套餐可在 vercel.json 中将 `maxDuration` 调整到最高 800 秒
+3. 单次请求体上限为 4.5 MB，只影响上传方向，不影响下载
+4. 修改环境变量后需要重新部署才能生效
+
+### 请求返回 403 Forbidden: Only GitHub URLs are allowed
+
+本项目只代理 GitHub 系域名（github.com、*.githubusercontent.com、codeload.github.com 等），以防止被当作开放代理滥用。如需扩展代理域名，可修改 `lib/proxy.js` 中的 `UPSTREAM_HOSTS`。
 
 ## 性能优化建议
 
 1. 使用自定义域名并配置 CDN
-2. 选择离用户最近的 Vercel 区域部署
-3. 考虑为经常访问的资源设置缓存策略 
+2. 选择离用户最近的 Vercel 区域部署（Settings → Functions → Function Region）
+3. raw/gist 等小文本响应自带 5 分钟边缘缓存（`s-maxage=300`）
