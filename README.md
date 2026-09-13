@@ -13,6 +13,7 @@
 - 支持主页伪装和 302 跳转
 - 内置爬虫屏蔽和上游域名白名单（只代理 GitHub 系域名）
 - 支持仓库 owner 白名单与简单的 IP 限速
+- 防搜索引擎收录：robots.txt 全站禁爬 + `X-Robots-Tag`/`meta` noindex 标记
 - 支持直接在域名后添加完整 GitHub 链接的方式
 
 ## 快速部署
@@ -127,6 +128,7 @@ git clone https://your-vercel-app.vercel.app/owner/repo.git
 - 上游域名白名单：只代理 `github.com`、`*.githubusercontent.com`、`codeload.github.com` 等 GitHub 系域名，其余一律 403，防止被当作开放代理滥用。
 - GitHub Token 只发送给 GitHub 代码/仓库域名，不会跟随重定向发送到签名 URL 主机（如 `objects.githubusercontent.com`）。
 - `RATE_LIMIT` 限速是单实例内存级缓解手段，如需更强的防护建议配合 Vercel Firewall 使用。
+- 防收录三重措施：`/robots.txt` 对所有爬虫返回 `Disallow: /`；所有响应（含代理内容）带 `X-Robots-Tag: noindex` 头；HTML 页面带 `meta robots` 标记。默认的 `BLOCKED_USER_AGENTS` 关键词已额外拦截 Googlebot、Bingbot、Baiduspider 等主流爬虫。
 
 ## 最近更新（v2.1）
 
