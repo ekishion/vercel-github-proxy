@@ -14,6 +14,7 @@
     "edge"
   ],
   "author": "",
+  "license": "MIT",
   "devDependencies": {
     "vercel": "^59.15.1"
   },

@@ -131,3 +131,7 @@ git clone https://your-vercel-app.vercel.app/owner/repo.git
 
 - 采用 Web 标准 Request/Response 实现核心转发（`lib/proxy.js`），入口做 Node 桥接；曾试迁 Edge Runtime，因 Vercel 已弃用 Edge（官方建议 Node.js 运行时）而保留 Node + Fluid 方案
 - v2.0：重构为单入口（`api/index.js` + `lib/` 共享模块），删除了 direct/proxy/debug/test 等冗余端点；改用原生 fetch 修复流式转发失效；支持 git clone 智能协议；新增 Range 断点续传；私有仓库 Token 覆盖 raw/gist/codeload；新增上游域名白名单与重定向逐跳校验；配置项全部环境变量化；首页支持生成加速链接并一键复制；修复 `URL`/`URL302` 伪装功能不生效的问题；移除 jsDelivr 自代理分支
+
+## 许可证
+
+本项目基于 [goukey/vercel-github-proxy](https://github.com/goukey/vercel-github-proxy) - [MIT](LICENSE)
